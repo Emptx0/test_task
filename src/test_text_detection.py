@@ -1,7 +1,10 @@
 import easyocr
 import cv2
+import re
 
 reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
+
+FORBIDDEN_RE = re.compile(r'[!@#$%^&*()\[\]{};:\'\"<>,./?~\\|+\-=]')
 
 for i in range(10):
     print(i+1)
@@ -12,6 +15,7 @@ for i in range(10):
 
     result = reader.readtext(binary)
 
+    prob = 0.0
     for item in result:
         for word in item[1].split():
             if len(word) != 9:
@@ -20,4 +24,12 @@ for i in range(10):
                 continue
             if word.isalpha():
                 continue
-            print(word)
+            if any(c.islower() for c in word):
+                continue
+            if bool(FORBIDDEN_RE.search(word)):
+                continue
+            if item[2] > prob:
+                prob = item[2]
+                print(word, prob)
+
+pass
