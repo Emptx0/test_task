@@ -2,8 +2,15 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
+from pathlib import Path
+from src.config import FACES_DIR
 
-def extract_face(path: str, passport_id: str) -> np.ndarray:
+
+def extract_face(
+        path: str,
+        verbose: bool = False
+) -> np.ndarray:
+
     mp_face_detection = mp.solutions.face_detection
 
     with mp_face_detection.FaceDetection(
@@ -16,6 +23,9 @@ def extract_face(path: str, passport_id: str) -> np.ndarray:
             raise ValueError("Failed to read input image.")
 
         h, w, _ = image.shape
+        if verbose:
+            print(f"Image size: {w}x{h}")
+
         results = face_detection.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
         if not results.detections:
@@ -37,9 +47,18 @@ def extract_face(path: str, passport_id: str) -> np.ndarray:
         x_max = min(w, x_min + box_w)
         y_max = min(h, y_min + box_h)
 
+        if verbose:
+            print(f"Bounding box:")
+            print(f"\tx_min={x_min}, y_min={y_min}, x_max={x_max}, y_max={y_max}")
+
         face_crop = image[y_min:y_max, x_min:x_max]
 
-        cv_path = f"/home/tym/projects/test_task/tmp/crop_{passport_id}.png"
-        cv2.imwrite(cv_path, face_crop)
+        filename = Path(path).name
+        try:
+            cv2.imwrite(str(FACES_DIR / filename), face_crop)
+            if verbose:
+                print(f"Cropped image saved to: {FACES_DIR}")
+        except Exception as e:
+            print(f"Warning: failed to save cropped image:\n{e}")
 
         return face_crop
