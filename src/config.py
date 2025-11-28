@@ -1,6 +1,8 @@
 from pathlib import Path
 
 
+# TODO dataclass for run_extraction_pipeline arguments
+
 BASE_DIR = Path(__file__).resolve().parent.parent  # Project directory
 FACES_DIR = BASE_DIR / "data/faces"  # Directory for saving facial images
 PROCESSED_IMAGES_DIR = BASE_DIR / "data/processed_images"  # Directory for saving processed images

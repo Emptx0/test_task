@@ -2,7 +2,7 @@ from typing import Tuple
 import extract_id, extract_face
 
 
-def run_extraction_pipeline(path: str, verbose: bool = False):  # TODO -> Tuple[str, str]:
+def run_extraction_pipeline(path: str, verbose: bool = False):  # TODO -> Tuple[str, str]: + in config.py dataclass
     passport_id = extract_id.extract_id(
         path,
         verbose=verbose,
