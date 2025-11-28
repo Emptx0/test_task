@@ -2,14 +2,21 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
+import time
+
 from pathlib import Path
 from src.config import FACES_DIR
 
 
 def extract_face(
         path: str,
-        verbose: bool = False
+        verbose: bool = False,
+        save_face_crop: bool = False,
 ) -> np.ndarray:
+
+    start = time.perf_counter()
+    if verbose:
+        print("\nFace extraction started...\n")
 
     mp_face_detection = mp.solutions.face_detection
 
@@ -38,7 +45,7 @@ def extract_face(
         bbox = detection.location_data.relative_bounding_box
 
         x_min = int(bbox.xmin * w - 20)
-        y_min = int(bbox.ymin * h - 75)
+        y_min = int(bbox.ymin * h - 95)
         box_w = int(bbox.width * w + 20)
         box_h = int(bbox.height * h + 95)
 
@@ -47,18 +54,21 @@ def extract_face(
         x_max = min(w, x_min + box_w)
         y_max = min(h, y_min + box_h)
 
-        if verbose:
-            print(f"Bounding box:")
-            print(f"\tx_min={x_min}, y_min={y_min}, x_max={x_max}, y_max={y_max}")
-
         face_crop = image[y_min:y_max, x_min:x_max]
 
-        filename = Path(path).name
-        try:
-            cv2.imwrite(str(FACES_DIR / filename), face_crop)
-            if verbose:
-                print(f"Cropped image saved to: {FACES_DIR}")
-        except Exception as e:
-            print(f"Warning: failed to save cropped image:\n{e}")
+        if save_face_crop:
+            filename = Path(path).name
+            try:
+                cv2.imwrite(str(FACES_DIR / filename), face_crop)
+                if verbose:
+                    print(f"Cropped image saved to: {FACES_DIR}\n")
+            except Exception as e:
+                print(f"Warning: failed to save cropped image:\n{e}")
+
+        if verbose:
+            duration = time.perf_counter() - start
+            print("Bounding box:")
+            print(f"\tx_min={x_min}, y_min={y_min}, x_max={x_max}, y_max={y_max}")
+            print(f"\n---- extract_face completed in {duration:.3f} s.\n")
 
         return face_crop

@@ -2,6 +2,8 @@ import easyocr
 import cv2
 import re
 
+import time
+
 from pathlib import Path
 from src.config import PROCESSED_IMAGES_DIR
 
@@ -19,6 +21,10 @@ def extract_id(
         save_preprocessed_image: bool = False,
         _fallback: bool = False
 ) -> str:
+
+    start = time.perf_counter()
+    if verbose:
+        print("\nID extraction started...\n")
 
     image = cv2.imread(path)
     if image is None:
@@ -46,7 +52,7 @@ def extract_id(
             try:
                 cv2.imwrite(str(PROCESSED_IMAGES_DIR / filename), binary)
                 if verbose:
-                    print(f"Processed image saved to: {str(PROCESSED_IMAGES_DIR)}")
+                    print(f"Processed image saved to: {str(PROCESSED_IMAGES_DIR)}\n")
             except Exception as e:
                 print(f"Warning: failed to save preprocessed image:\n{e}")
 
@@ -93,9 +99,18 @@ def extract_id(
                   f"Trying image_preprocessing={not image_preprocessing} ...\n")
 
         if not _fallback:
-            return extract_id(path=path, verbose=verbose, image_preprocessing=not image_preprocessing,
-                              save_preprocessed_image=save_preprocessed_image, _fallback=True)
+            return extract_id(
+                path=path,
+                verbose=verbose,
+                image_preprocessing=not image_preprocessing,
+                save_preprocessed_image=save_preprocessed_image,
+                _fallback=True
+            )
 
         raise ValueError("Passport ID could not be found on the image.")
+
+    if verbose:
+        duration = time.perf_counter() - start
+        print(f"\n---- extract_id completed in {duration:.3f} s.\n")
 
     return passport_id
