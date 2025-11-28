@@ -11,22 +11,34 @@ mp_drawing = mp.solutions.drawing_utils
 IMAGE_DIR = Path("/home/tym/projects/test_task/sample_data")
 
 IMAGE_FILES = [str(p) for p in IMAGE_DIR.iterdir() if p.is_file()]
-IMAGE_FILES = ["/home/tym/projects/test_task/sample_data/Examples-of-ID-cards-a-to-c-showcase-examples-of-bona-fide-generated-print.png"]
 
 with mp_face_detection.FaceDetection(
         model_selection=1, min_detection_confidence=0.5) as face_detection:
     for idx, file in enumerate(IMAGE_FILES):
         image = cv2.imread(file)
-        # Convert the BGR image to RGB and process it with MediaPipe Face Detection.
+        h, w, _ = image.shape
         results = face_detection.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-        # Draw face detections of each face.
         if not results.detections:
             continue
-        annotated_image = image.copy()
-        for detection in results.detections:
-            print('Nose tip:')
-            print(mp_face_detection.get_key_point(
-                detection, mp_face_detection.FaceKeyPoint.NOSE_TIP))
-            mp_drawing.draw_detection(annotated_image, detection)
-        cv2.imwrite('tmp/annotated_image' + str(idx) + '.png', annotated_image)
+
+        for i, detection in enumerate(results.detections):
+            bbox = detection.location_data.relative_bounding_box
+
+            x_min = int(bbox.xmin * w - 20)
+            y_min = int(bbox.ymin * h - 75)
+            box_w = int(bbox.width * w + 20)
+            box_h = int(bbox.height * h + 90)
+
+            # Коректуємо межі, щоб не вилізти за картинку
+            x_min = max(0, x_min)
+            y_min = max(0, y_min)
+            x_max = min(w, x_min + box_w)
+            y_max = min(h, y_min + box_h)
+
+            # Вирізаємо обличчя
+            face_crop = image[y_min:y_max, x_min:x_max]
+
+            # Зберігаємо
+            cv_path = f"tmp/crop_{idx}_{i}.png"
+            cv2.imwrite(cv_path, face_crop)

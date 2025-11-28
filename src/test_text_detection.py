@@ -31,5 +31,3 @@ for i in range(10):
             if item[2] > prob:
                 prob = item[2]
                 print(word, prob)
-
-pass

@@ -1,3 +1,4 @@
 sample_data/
-src/tmp/
+tmp/
 .idea
+__pycache__/
