@@ -10,7 +10,6 @@ from src.config import PROCESSED_IMAGES_DIR
 
 reader = easyocr.Reader(["en"])
 
-
 FORBIDDEN_RE = re.compile(r"[!@#$%^&*()\[\]{};:'\"<>,./?~\\|+\-=]")
 
 

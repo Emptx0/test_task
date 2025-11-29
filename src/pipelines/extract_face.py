@@ -11,7 +11,7 @@ from src.config import FACES_DIR
 def extract_face(
         path: str,
         verbose: bool = False,
-        save_face_crop: bool = False,
+        save_face_crop: bool = True,
 ) -> np.ndarray:
 
     start = time.perf_counter()
@@ -44,10 +44,10 @@ def extract_face(
         detection = results.detections[0]
         bbox = detection.location_data.relative_bounding_box
 
-        x_min = int(bbox.xmin * w - 20)
-        y_min = int(bbox.ymin * h - 95)
-        box_w = int(bbox.width * w + 20)
-        box_h = int(bbox.height * h + 95)
+        x_min = int(bbox.xmin * w - 40)
+        y_min = int(bbox.ymin * h - 100)
+        box_w = int(bbox.width * w + 60)
+        box_h = int(bbox.height * h + 170)
 
         x_min = max(0, x_min)
         y_min = max(0, y_min)

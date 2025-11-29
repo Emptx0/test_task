@@ -1,4 +1,6 @@
 data/processed_images/
-data/faces
+data/faces/
+data/test/
+uploads/
 .idea
 __pycache__/
