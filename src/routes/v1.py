@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from pathlib import Path
+import os
 from src.config import (
     UPLOAD_DIR,
     DEBUG,
@@ -28,20 +29,20 @@ async def upload(image: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file:{e}")
 
-    passport_id, face_img_encoded = run_extraction_pipeline(
-        path=str(image_path),
-        verbose=DEBUG,
-        id_kwargs={
-            "image_preprocessing": START_WITH_PROCESSING,
-            "save_preprocessed_image": SAVE_PROCESSED_IMAGES
-        },
-        face_kwargs={"save_face_crop": SAVE_FACES}
-    )
-
     try:
-        pass
+        passport_id, face_img_encoded = run_extraction_pipeline(
+            path=str(image_path),
+            verbose=DEBUG,
+            id_kwargs={
+                "image_preprocessing": START_WITH_PROCESSING,
+                "save_preprocessed_image": SAVE_PROCESSED_IMAGES
+            },
+            face_kwargs={"save_face_crop": SAVE_FACES}
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Pipeline error:{e}")
+
+    os.remove(image_path)
 
     return {
         "passport_id": passport_id,

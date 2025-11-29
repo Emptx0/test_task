@@ -1,8 +1,6 @@
 .idea
 __pycache__/
 
-data/processed_images/
-data/faces/
-data/test/
-uploads/
+data/
+sample_data/
 .env
