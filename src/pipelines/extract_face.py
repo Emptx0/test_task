@@ -2,10 +2,14 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-import time
-
 from pathlib import Path
 from src.config import FACES_DIR
+
+import time
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def extract_face(
@@ -16,7 +20,7 @@ def extract_face(
 
     start = time.perf_counter()
     if verbose:
-        print("\nFace extraction started...\n")
+        logger.info("Face extraction started...\n")
 
     mp_face_detection = mp.solutions.face_detection
 
@@ -31,7 +35,7 @@ def extract_face(
 
         h, w, _ = image.shape
         if verbose:
-            print(f"Image size: {w}x{h}")
+            logger.info(f"Image size: {w}x{h}")
 
         results = face_detection.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
@@ -57,18 +61,21 @@ def extract_face(
         face_crop = image[y_min:y_max, x_min:x_max]
 
         if save_face_crop:
-            filename = Path(path).name
+            name = Path(path).name
+            original_name = f"original_{Path(path).name}"
+            cropped_name = f"cropped_{name}"
             try:
-                cv2.imwrite(str(FACES_DIR / filename), face_crop)
+                cv2.imwrite(str(FACES_DIR / cropped_name), face_crop)
+                cv2.imwrite(str(FACES_DIR / original_name), image)
                 if verbose:
-                    print(f"Cropped image saved to: {FACES_DIR}\n")
+                    logger.info(f"Cropped and original images saved to: {FACES_DIR}\n")
             except Exception as e:
-                print(f"Warning: failed to save cropped image:\n{e}")
+                logger.warning(f"Failed to save images: {e}")
 
         if verbose:
             duration = time.perf_counter() - start
-            print("Bounding box:")
-            print(f"\tx_min={x_min}, y_min={y_min}, x_max={x_max}, y_max={y_max}")
-            print(f"\n---- extract_face completed in {duration:.3f} s.\n")
+            logger.info("Bounding box:"
+                        f"x_min={x_min}, y_min={y_min}, x_max={x_max}, y_max={y_max}")
+            logger.info(f"Completed in {duration:.3f} s.\n")
 
         return face_crop

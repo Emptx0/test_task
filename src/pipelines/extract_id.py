@@ -2,11 +2,14 @@ import easyocr
 import cv2
 import re
 
-import time
-
 from pathlib import Path
 from src.config import PROCESSED_IMAGES_DIR
 
+import time
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 reader = easyocr.Reader(["en"])
 
@@ -23,7 +26,7 @@ def extract_id(
 
     start = time.perf_counter()
     if verbose:
-        print("\nID extraction started...\n")
+        logger.info("ID extraction started...\n")
 
     image = cv2.imread(path)
     if image is None:
@@ -51,9 +54,9 @@ def extract_id(
             try:
                 cv2.imwrite(str(PROCESSED_IMAGES_DIR / filename), binary)
                 if verbose:
-                    print(f"Processed image saved to: {str(PROCESSED_IMAGES_DIR)}\n")
+                    logger.info(f"Processed image saved to: {str(PROCESSED_IMAGES_DIR)}\n")
             except Exception as e:
-                print(f"Warning: failed to save preprocessed image:\n{e}")
+                logger.warning(f"Failed to save preprocessed image:\n{e}")
 
     else:
         processed_image = image
@@ -73,7 +76,7 @@ def extract_id(
     for _, text, prob in result:
 
         if verbose:
-            print(text, prob)
+            logger.info(f"{text}, prob={prob}")
 
         for word in text.split():
             if len(word) != 9:
@@ -94,8 +97,8 @@ def extract_id(
     if passport_id is None:
 
         if verbose:
-            print(f"\nNo passport id detected.\n"
-                  f"Trying image_preprocessing={not image_preprocessing} ...\n")
+            logger.info(f"\nNo passport id detected.\n"
+                        f"Trying image_preprocessing={not image_preprocessing} ...\n")
 
         if not _fallback:
             return extract_id(
@@ -110,6 +113,6 @@ def extract_id(
 
     if verbose:
         duration = time.perf_counter() - start
-        print(f"\n---- extract_id completed in {duration:.3f} s.\n")
+        logger.info(f"Completed in {duration:.3f} s.\n")
 
     return passport_id

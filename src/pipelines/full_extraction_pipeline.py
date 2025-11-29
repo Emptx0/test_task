@@ -1,5 +1,4 @@
 from typing import Tuple
-
 from src.pipelines import (
     extract_id,
     extract_face,

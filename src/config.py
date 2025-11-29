@@ -1,5 +1,20 @@
 from pathlib import Path
+from dotenv import load_dotenv
+from os import getenv
+import logging
 
+
+load_dotenv()
+DEBUG = getenv("DEBUG", "false").lower() == "true"  # Debug mode from .env
+SAVE_FACES = getenv("SAVE_FACES", "false").lower() == "true"
+SAVE_PROCESSED_IMAGES = getenv("SAVE_PROCESSED_IMAGES", "false").lower() == "true"
+START_WITH_PROCESSING = getenv("START_WITH_PROCESSING", "false").lower() == "true"
+
+# logging config
+logging.basicConfig(
+    level=logging.DEBUG if DEBUG else logging.INFO,
+    format="%(levelname)s | %(name)s | %(message)s"
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # Project directory
 
