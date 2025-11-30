@@ -5,4 +5,4 @@ data/
 sample_data/
 .env
 
-*_Zone.Identifier
+*Zone.Identifier
