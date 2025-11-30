@@ -1,0 +1,7 @@
+fastapi~=0.122.0
+uvicorn
+python-multipart
+python-dotenv~=1.2.1
+easyocr~=1.7.2
+mediapipe~=0.10.21
+numpy<2
