@@ -41,8 +41,8 @@ async def upload(image: UploadFile = File(...)):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Pipeline error:{e}")
-
-    os.remove(image_path)
+    finally:
+        os.remove(image_path)
 
     return {
         "passport_id": passport_id,
